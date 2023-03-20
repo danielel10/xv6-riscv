@@ -5,6 +5,7 @@
         "defs.h": "c",
         "exception": "c",
         "new": "c",
-        "cstdlib": "cpp"
+        "cstdlib": "cpp",
+        "typeinfo": "c"
     },
 }

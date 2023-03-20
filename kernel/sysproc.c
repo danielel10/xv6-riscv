@@ -11,7 +11,11 @@ sys_exit(void)
 {
   int n;
   argint(0, &n);
-  exit(n);
+  //task3
+  char* exit_msg[32];
+  argstr(0,exit_msg,MAXPATH);
+  exit(n,exit_msg);
+  //end of task3
   return 0;  // not reached
 }
 
