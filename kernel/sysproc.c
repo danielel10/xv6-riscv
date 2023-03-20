@@ -12,7 +12,7 @@ sys_exit(void)
   int n;
   argint(0, &n);
   //task3
-  char* exit_msg[32];
+  char exit_msg[32];
   argstr(0,exit_msg,MAXPATH);
   exit(n,exit_msg);
   //end of task3

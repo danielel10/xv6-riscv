@@ -12,5 +12,5 @@ main(int argc, char *argv[])
   free(pt);
   fprintf(1, "Curr proc size is:%x\n", memsize()); 
   
-  exit(0);
+  exit(0,"");
 }

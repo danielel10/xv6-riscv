@@ -8,5 +8,5 @@ main(int argc, char *argv[])
   write(1, "Hello World xv6\n", strlen("Hello World xv6\n"));
     
   
-  exit(0);
+  exit(0,"");
 }
