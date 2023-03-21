@@ -94,7 +94,11 @@ runcmd(struct cmd *cmd)
     lcmd = (struct listcmd*)cmd;
     if(fork1() == 0)
       runcmd(lcmd->left);
-    wait(0,"");
+    //task3.5
+    char str[32];
+    wait(0,str);
+    printf("%s\n", str);
+    //task3.5
     runcmd(lcmd->right);
     break;
 
@@ -167,7 +171,11 @@ main(void)
     }
     if(fork1() == 0)
       runcmd(parsecmd(buf));
-    wait(0,"");
+    //task 3.5
+    char str[32];
+    wait(0,str);
+    //task 3.5
+    printf("%s\n", str);
   }
   exit(0,"");
 }
