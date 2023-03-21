@@ -10,7 +10,9 @@ main(int argc, char *argv[])
   fprintf(1, "Curr proc size is:%x\n", memsize());
   
   free(pt);
-  fprintf(1, "Curr proc size is:%x\n", memsize()); 
-  
+  fprintf(1, "Curr proc size is:%x\n", memsize());
+  // char* str;
+  //wait(ch,str)
+  //print(str)
   exit(0,"");
 }

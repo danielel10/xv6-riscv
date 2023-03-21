@@ -393,14 +393,13 @@ exit(int status, char* exit_msg)
 // Wait for a child process to exit and return its pid.
 // Return -1 if this process has no children.
 int
-wait(uint64 addr)
+wait(uint64 addr, uint64 addr1)
 {
   struct proc *pp;
   int havekids, pid;
   struct proc *p = myproc();
 
   acquire(&wait_lock);
-
   for(;;){
     // Scan through table looking for exited children.
     havekids = 0;
@@ -408,13 +407,14 @@ wait(uint64 addr)
       if(pp->parent == p){
         // make sure the child isn't still in exit() or swtch().
         acquire(&pp->lock);
-
+        copyout(p->pagetable, addr1, (char *)pp->exit_msg, sizeof(pp->exit_msg));
         havekids = 1;
         if(pp->state == ZOMBIE){
           // Found one.
           pid = pp->pid;
           if(addr != 0 && copyout(p->pagetable, addr, (char *)&pp->xstate,
                                   sizeof(pp->xstate)) < 0) {
+            // if(copyout(p->pagetable, addr, (char *)pp->exit_msg, sizeof(pp->exit_msg) + sizeof(pp->xstate)) < 0){
             release(&pp->lock);
             release(&wait_lock);
             return -1;

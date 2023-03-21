@@ -13,7 +13,7 @@ sys_exit(void)
   argint(0, &n);
   //task3
   char exit_msg[32];
-  argstr(0,exit_msg,MAXPATH);
+  argstr(1,exit_msg,MAXPATH);
   exit(n,exit_msg);
   //end of task3
   return 0;  // not reached
@@ -35,8 +35,10 @@ uint64
 sys_wait(void)
 {
   uint64 p;
+  uint64 p1;
   argaddr(0, &p);
-  return wait(p);
+  argaddr(1, &p1);
+  return wait(p,p1);
 }
 
 uint64
