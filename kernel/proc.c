@@ -407,18 +407,23 @@ wait(uint64 addr, uint64 addr1)
       if(pp->parent == p){
         // make sure the child isn't still in exit() or swtch().
         acquire(&pp->lock);
-        copyout(p->pagetable, addr1, (char *)pp->exit_msg, sizeof(pp->exit_msg));
         havekids = 1;
         if(pp->state == ZOMBIE){
           // Found one.
           pid = pp->pid;
           if(addr != 0 && copyout(p->pagetable, addr, (char *)&pp->xstate,
                                   sizeof(pp->xstate)) < 0) {
-            // if(copyout(p->pagetable, addr, (char *)pp->exit_msg, sizeof(pp->exit_msg) + sizeof(pp->xstate)) < 0){
             release(&pp->lock);
             release(&wait_lock);
             return -1;
           }
+          //task3
+          if(addr1 != 0 && copyout(p->pagetable, addr1, (char *)pp->exit_msg, sizeof(pp->exit_msg)) < 0 ) {
+            release(&pp->lock);
+            release(&wait_lock);
+            return -1;
+          }
+          //task3
           freeproc(pp);
           release(&pp->lock);
           release(&wait_lock);
