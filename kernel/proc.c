@@ -467,31 +467,28 @@ scheduler(void)
     // Avoid deadlock by ensuring that devices can interrupt.
     intr_on();
 
+    //find min acc
     struct proc *min_p = 0;
     long long min_accumulator = MAXPATH;
     for(p = proc; p < &proc[NPROC]; p++) {
-      acquire(&p->lock);
       if(p->state == RUNNABLE && p->accumulator < min_accumulator) {
         min_accumulator = p->accumulator;
         min_p = p;
       }
-      release(&p->lock);
     }
 
 
     if(min_p != 0) {
-      // Find the first process with the minimum accumulator value
+      // find the first process to have the min acc if you have many.
       struct proc *first_min_p = min_p;
-      acquire(&first_min_p->lock);
       for(p = proc; p < &proc[NPROC]; p++) {
-        
         if(p != first_min_p && p->state == RUNNABLE && p->accumulator == min_accumulator) {
-          
           first_min_p = p;
+          break;
         }
       }
-
-      if(first_min_p->state == RUNNABLE) {
+      acquire(&first_min_p->lock);
+      if(first_min_p->state == RUNNABLE) { 
         first_min_p->state = RUNNING;
         c->proc = first_min_p;
         swtch(&c->context, &first_min_p->context);
