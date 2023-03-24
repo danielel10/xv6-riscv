@@ -380,7 +380,6 @@ exit(int status, char* exit_msg)
   p->state = ZOMBIE;
   //task3
   safestrcpy(p->exit_msg,exit_msg,sizeof(p->exit_msg));
-  //p->exit_msg = exit_msg;
   //end of task3
 
   release(&wait_lock);

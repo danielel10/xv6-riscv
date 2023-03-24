@@ -13,7 +13,7 @@ sys_exit(void)
   argint(0, &n);
   //task3
   char exit_msg[32];
-  argstr(1,exit_msg,MAXPATH);
+  argstr(1,exit_msg,32);
   exit(n,exit_msg);
   //end of task3
   return 0;  // not reached
@@ -101,3 +101,10 @@ sys_memsize(void)
 {
   return myproc()->sz;
 }
+
+//task 5
+uint64
+sys_set_ps_priority(void) {
+  return 0;
+}
+//task 5
