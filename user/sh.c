@@ -174,8 +174,9 @@ main(void)
     //task 3.5
     char str[32];
     wait(0,str);
-    //task 3.5
     printf("%s\n", str);
+    //task 3.5
+
   }
   exit(0,"");
 }

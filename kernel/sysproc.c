@@ -103,8 +103,10 @@ sys_memsize(void)
 }
 
 //task 5
-uint64
+void
 sys_set_ps_priority(void) {
-  return 0;
+  int n;
+  argint(0, &n);
+  myproc()->ps_priority = n;
 }
 //task 5

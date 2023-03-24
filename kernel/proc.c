@@ -320,6 +320,10 @@ fork(void)
 
   acquire(&np->lock);
   np->state = RUNNABLE;
+  //task5 - create new proc with min acc of runnin or runnable proc
+  np->ps_priority = 5;
+  np->accumulator =  min_acc();
+  //task5
   release(&np->lock);
 
   return pid;
@@ -450,6 +454,8 @@ wait(uint64 addr, uint64 addr1)
 //  - swtch to start running that process.
 //  - eventually that process transfers control
 //    via swtch back to the scheduler.
+
+//task5 - edited sched
 void
 scheduler(void)
 {
@@ -457,28 +463,79 @@ scheduler(void)
   struct cpu *c = mycpu();
   
   c->proc = 0;
-  for(;;){
+  for(;;) {
     // Avoid deadlock by ensuring that devices can interrupt.
     intr_on();
 
+    struct proc *min_p = 0;
+    long long min_accumulator = MAXPATH;
     for(p = proc; p < &proc[NPROC]; p++) {
       acquire(&p->lock);
-      if(p->state == RUNNABLE) {
-        // Switch to chosen process.  It is the process's job
-        // to release its lock and then reacquire it
-        // before jumping back to us.
-        p->state = RUNNING;
-        c->proc = p;
-        swtch(&c->context, &p->context);
-
-        // Process is done running for now.
-        // It should have changed its p->state before coming back.
-        c->proc = 0;
+      if(p->state == RUNNABLE && p->accumulator < min_accumulator) {
+        min_accumulator = p->accumulator;
+        min_p = p;
       }
       release(&p->lock);
     }
+
+
+    if(min_p != 0) {
+      // Find the first process with the minimum accumulator value
+      struct proc *first_min_p = min_p;
+      acquire(&first_min_p->lock);
+      for(p = proc; p < &proc[NPROC]; p++) {
+        
+        if(p != first_min_p && p->state == RUNNABLE && p->accumulator == min_accumulator) {
+          
+          first_min_p = p;
+        }
+      }
+
+      if(first_min_p->state == RUNNABLE) {
+        first_min_p->state = RUNNING;
+        c->proc = first_min_p;
+        swtch(&c->context, &first_min_p->context);
+        c->proc = 0;
+      }
+      release(&first_min_p->lock);
+    }
   }
 }
+
+
+//task5
+
+//working sched
+// void
+// scheduler(void)
+// {
+//   struct proc *p;
+//   struct cpu *c = mycpu();
+  
+//   c->proc = 0;
+//   for(;;){
+//     // Avoid deadlock by ensuring that devices can interrupt.
+//     intr_on();
+//     for(p = proc; p < &proc[NPROC]; p++) {
+//       acquire(&p->lock);
+//       if(p->state == RUNNABLE) {
+//         // Switch to chosen process.  It is the process's job
+//         // to release its lock and then reacquire it
+//         // before jumping back to us.
+//         p->state = RUNNING;
+//         c->proc = p;
+//         swtch(&c->context, &p->context);
+
+//         // Process is done running for now.
+//         // It should have changed its p->state before coming back.
+//         c->proc = 0;
+//       }
+//       release(&p->lock);
+//     }
+//   }
+// }
+//working sched
+
 
 // Switch to scheduler.  Must hold only p->lock
 // and have changed proc->state. Saves and restores
@@ -514,6 +571,9 @@ yield(void)
   struct proc *p = myproc();
   acquire(&p->lock);
   p->state = RUNNABLE;
+  //task5
+  p->accumulator += p->ps_priority;
+  //task5
   sched();
   release(&p->lock);
 }
@@ -581,6 +641,9 @@ wakeup(void *chan)
     if(p != myproc()){
       acquire(&p->lock);
       if(p->state == SLEEPING && p->chan == chan) {
+        //task5 - change acc to be min of acc
+        p->accumulator =  min_acc();
+        //task5
         p->state = RUNNABLE;
       }
       release(&p->lock);
@@ -690,3 +753,31 @@ procdump(void)
     printf("\n");
   }
 }
+
+//tak5
+
+// set priority
+void 
+set_ps_priority(int priority) 
+{
+  struct proc *p = myproc();
+  p->ps_priority = priority;
+}
+
+//finds min acc
+long long
+min_acc(void)
+{
+  long long min = 10;
+  int runnable_proccesses = 0;
+  struct proc *p;
+  for(p = proc; p < &proc[NPROC]; p++) {
+    if ((p->state == RUNNABLE || p->state == RUNNING ) && p->accumulator < min)
+      min = p->accumulator;
+    if ((p->state == RUNNABLE))
+      runnable_proccesses++;
+  }
+  return runnable_proccesses == 1 ? 0 : min;
+}
+
+//task5

@@ -5,5 +5,5 @@
 int
 main(int argc, char *argv[])
 {
-    exit(0,"Goodbye World xv6ssssssssssssssssssssssssssssssssssssssss");
+    exit(0,"Goodbye World xv6");
 }
