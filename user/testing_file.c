@@ -5,6 +5,17 @@
 int
 main(int argc, char *argv[])
 {   
-    set_ps_priority(7);
-    exit(0,"Goodbye World xv6");
+    //give father 1
+    //fork
+    
+    int pid = fork();
+    if(pid == 0) {
+        exit(1,"son");
+        
+    }
+    else {
+        exit(0,"father");
+    }
+    exit(0,"err");
+    
 }

@@ -48,7 +48,6 @@ void
 procinit(void)
 {
   struct proc *p;
-  
   initlock(&pid_lock, "nextpid");
   initlock(&wait_lock, "wait_lock");
   for(p = proc; p < &proc[NPROC]; p++) {
@@ -251,6 +250,11 @@ userinit(void)
 
   p->state = RUNNABLE;
 
+  //task5
+  p->ps_priority = 5;
+  p->accumulator =  min_acc();
+  //task5
+  
   release(&p->lock);
 }
 
@@ -456,53 +460,6 @@ wait(uint64 addr, uint64 addr1)
 //    via swtch back to the scheduler.
 
 //task5 - edited sched
-void
-scheduler(void)
-{
-  struct proc *p;
-  struct cpu *c = mycpu();
-  
-  c->proc = 0;
-  for(;;) {
-    // Avoid deadlock by ensuring that devices can interrupt.
-    intr_on();
-
-    //find min acc
-    struct proc *min_p = 0;
-    long long min_accumulator = MAXPATH;
-    for(p = proc; p < &proc[NPROC]; p++) {
-      if(p->state == RUNNABLE && p->accumulator < min_accumulator) {
-        min_accumulator = p->accumulator;
-        min_p = p;
-      }
-    }
-
-    //if there is a runnable proccess
-    if(min_p != 0) {
-      // find the first process to have the min acc if you have many.
-      struct proc *first_min_p = min_p;
-      for(p = proc; p < &proc[NPROC]; p++) {
-        if(p != first_min_p && p->state == RUNNABLE && p->accumulator == min_accumulator) {
-          first_min_p = p;
-          break;
-        }
-      }
-      acquire(&first_min_p->lock);
-      if(first_min_p->state == RUNNABLE) { 
-        first_min_p->state = RUNNING;
-        c->proc = first_min_p;
-        swtch(&c->context, &first_min_p->context);
-        c->proc = 0;
-      }
-      release(&first_min_p->lock);
-    }
-  }
-}
-
-
-//task5
-
-//working sched
 // void
 // scheduler(void)
 // {
@@ -510,28 +467,73 @@ scheduler(void)
 //   struct cpu *c = mycpu();
   
 //   c->proc = 0;
-//   for(;;){
+//   for(;;) {
 //     // Avoid deadlock by ensuring that devices can interrupt.
 //     intr_on();
-//     for(p = proc; p < &proc[NPROC]; p++) {
-//       acquire(&p->lock);
-//       if(p->state == RUNNABLE) {
-//         // Switch to chosen process.  It is the process's job
-//         // to release its lock and then reacquire it
-//         // before jumping back to us.
-//         p->state = RUNNING;
-//         c->proc = p;
-//         swtch(&c->context, &p->context);
 
-//         // Process is done running for now.
-//         // It should have changed its p->state before coming back.
+//     //find min acc
+//     struct proc *min_p = 0;
+//     long long min_accumulator = MAXPATH;
+//     for(p = proc; p < &proc[NPROC]; p++) {
+//       if(p->state == RUNNABLE && p->accumulator < min_accumulator) {
+//         min_accumulator = p->accumulator;
+//         min_p = p;
+//       }
+//     }
+
+//     //if there is a runnable proccess
+//     if(min_p != 0) {
+//       // find the first process to have the min acc if you have many.
+//       struct proc *first_min_p = min_p;
+//       for(p = proc; p < &proc[NPROC]; p++) {
+//         if(p != first_min_p && p->state == RUNNABLE && p->accumulator == min_accumulator) {
+//           first_min_p = p;
+//           break;
+//         }
+//       }
+//       acquire(&first_min_p->lock);
+//       if(first_min_p->state == RUNNABLE) { 
+//         first_min_p->state = RUNNING;
+//         c->proc = first_min_p;
+//         swtch(&c->context, &first_min_p->context);
 //         c->proc = 0;
 //       }
-//       release(&p->lock);
+//       release(&first_min_p->lock);
 //     }
 //   }
 // }
-//working sched
+//task5
+
+//orig sched
+void
+scheduler(void)
+{
+  struct proc *p;
+  struct cpu *c = mycpu();
+  
+  c->proc = 0;
+  for(;;){
+    // Avoid deadlock by ensuring that devices can interrupt.
+    intr_on();
+    for(p = proc; p < &proc[NPROC]; p++) {
+      acquire(&p->lock);
+      if(p->state == RUNNABLE) {
+        // Switch to chosen process.  It is the process's job
+        // to release its lock and then reacquire it
+        // before jumping back to us.
+        p->state = RUNNING;
+        c->proc = p;
+        swtch(&c->context, &p->context);
+
+        // Process is done running for now.
+        // It should have changed its p->state before coming back.
+        c->proc = 0;
+      }
+      release(&p->lock);
+    }
+  }
+}
+//orig sched
 
 
 // Switch to scheduler.  Must hold only p->lock
