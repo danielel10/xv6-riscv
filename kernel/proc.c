@@ -477,7 +477,7 @@ scheduler(void)
       }
     }
 
-
+    //if there is a runnable proccess
     if(min_p != 0) {
       // find the first process to have the min acc if you have many.
       struct proc *first_min_p = min_p;
@@ -568,9 +568,6 @@ yield(void)
   struct proc *p = myproc();
   acquire(&p->lock);
   p->state = RUNNABLE;
-  //task5
-  p->accumulator += p->ps_priority;
-  //task5
   sched();
   release(&p->lock);
 }
