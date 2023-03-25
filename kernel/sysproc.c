@@ -107,6 +107,6 @@ void
 sys_set_ps_priority(void) {
   int n;
   argint(0, &n);
-  myproc()->ps_priority = n;
+  set_ps_priority(n);
 }
 //task 5

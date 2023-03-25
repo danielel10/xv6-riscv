@@ -107,7 +107,9 @@ int             either_copyout(int user_dst, uint64 dst, void *src, uint64 len);
 int             either_copyin(void *dst, int user_src, uint64 src, uint64 len);
 void            procdump(void);
 //task5
+void            set_ps_priority(int);
 long long       min_acc(void);
+//task5
 
 // swtch.S
 void            swtch(struct context*, struct context*);
