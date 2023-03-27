@@ -504,7 +504,7 @@ wait(uint64 addr, uint64 addr1)
 // }
 //task5
 
-//orig sched test
+//orig sched
 void
 scheduler(void)
 {
